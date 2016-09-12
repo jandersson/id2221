@@ -66,7 +66,8 @@ $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
    - Namenode: [http://127.0.0.1:50070](http://127.0.0.1:50070)
    - Datanode: [http://127.0.0.1:50075](http://127.0.0.1:50075)
 3. Try HDFS commands
-   ```bash
+
+```bash
 # Create a new directory /sics on HDFS
 $HADOOP_HOME/bin/hdfs dfs -mkdir /sics
 
@@ -82,22 +83,22 @@ $HADOOP_HOME/bin/hdfs dfs -du -h /sics/big
 
 # Print the first 5 lines to screen from big on HDFS
 $HADOOP_HOME/bin/hdfs dfs -cat /sics/big | head -n 5
-   
+
 # Copy big to /big hdfscopy on HDFS
 $HADOOP_HOME/bin/hdfs dfs -cp /sics/big /sics/big_hdfscopy
- 
+
 # Copy big back to local filesystem and name it big localcopy
 $HADOOP_HOME/bin/hdfs dfs -get /sics/big big_localcopy
-   
+
 # Check the entire HDFS filesystem for inconsistencies/problems
 $HADOOP_HOME/bin/hdfs fsck /
-   
+
 # Delete big from HDFS
 $HADOOP_HOME/bin/hdfs dfs -rm /sics/big
-   
+
 # Delete /sics directory from HDFS
 $HADOOP_HOME/bin/hdfs dfs -rm -r /sics
-   ```
+```
 
 ## Part 2: MapReduce
 
@@ -134,7 +135,7 @@ The functionality of the map method is as follows:
 3. Use a tokenizer to split the line into words.
 
 4. Iterate through each word and form key-value pairs as `(word, one)` and push it to the output collector.
-    
+
 #### Word Count Reducer
    ```java
 public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
@@ -178,7 +179,7 @@ public class WordCount {
   public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
     private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
-	
+
     public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) throws IOException {
       String line = value.toString();
       StringTokenizer tokenizer = new StringTokenizer(line);
@@ -195,7 +196,7 @@ public class WordCount {
         while (values.hasNext()) {
           sum += values.next().get();
         }
-	
+
         output.collect(key, new IntWritable(sum));
     }
   }
@@ -294,7 +295,7 @@ public static class TopTenMapper extends Mapper<Object, Text, NullWritable, Text
    ```
 
 ### The Reducer Code
-The reducer determines its top ten records in a way that's very similar to the mapper. Because we configured our job to have one reducer using `job.setNumReduceTasks(1)` and we used `NullWritable` as our key, there will be one input group for this reducer that contains all the potential top ten records. The reducer iterates through all these records and stores them in a `TreeMap`. After all the values have been iterated over, the values contained in the `TreeMap` are flushed to the file system in descending order. 
+The reducer determines its top ten records in a way that's very similar to the mapper. Because we configured our job to have one reducer using `job.setNumReduceTasks(1)` and we used `NullWritable` as our key, there will be one input group for this reducer that contains all the potential top ten records. The reducer iterates through all these records and stores them in a `TreeMap`. After all the values have been iterated over, the values contained in the `TreeMap` are flushed to the file system in descending order.
    ```java
 public static class TopTenReducer extends Reducer<NullWritable, Text, NullWritable, Text> {
   // Stores a map of user reputation to the record
@@ -331,4 +332,3 @@ The input file, `users.xml`, is in XML format with the following syntax:
   DownVotes="37" AccountId="-1" />
    ```
 You can use `transformXmlToMap` method to read and parse XML files. The file is in the `topten/data` folder.
-
